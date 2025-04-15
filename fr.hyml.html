@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diabetes Chatbot</title>
+  <style>
+    /* General Styles */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    /* Chat Container */
+    .chat-container {
+      width: 100%;
+      max-width: 800px;
+      height: 90vh;
+      background-color: #fff;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Chat Header */
+    .chat-header {
+      background-color: #007bff;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      border-radius: 15px 15px 0 0;
+    }
+
+    /* Chat Box */
+    .chat-box {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      background-color: #f9f9f9;
+    }
+
+    /* Messages */
+    .message {
+      max-width: 70%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      position: relative;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .message.user {
+      align-self: flex-end;
+      background-color: #007bff;
+      color: #fff;
+      border-radius: 12px 12px 0 12px;
+    }
+
+    .message.bot {
+      align-self: flex-start;
+      background-color: #e9ecef;
+      color: #333;
+      border-radius: 12px 12px 12px 0;
+    }
+
+    /* Typing Indicator */
+    .typing-indicator {
+      align-self: flex-start;
+      background-color: #e9ecef;
+      color: #333;
+      padding: 10px 15px;
+      border-radius: 12px;
+      font-style: italic;
+      display: none; /* Hidden by default */
+    }
+
+    /* Chat Input */
+    .chat-input {
+      display: flex;
+      padding: 15px;
+      background-color: #fff;
+      border-top: 1px solid #ddd;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      outline: none;
+      font-size: 16px;
+    }
+
+    .chat-input button {
+      padding: 12px 20px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      margin-left: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .chat-input button:hover {
+      background-color: #0056b3;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">
+      Diabetes Assistant 🤖
+    </div>
+    <div class="chat-box" id="chat-box">
+      <div class="message bot">
+        Hello! I'm your Diabetes Assistant. How can I help you today? 😊
+      </div>
+    </div>
+    <div class="chat-input">
+      <input type="text" id="user-input" placeholder="Type your message...">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const chatBox = document.getElementById('chat-box');
+    const userInput = document.getElementById('user-input');
+
+    // Predefined responses for common diabetes-related questions
+    const responses = {
+      "what is diabetes?": "Diabetes is a chronic condition that affects how your body turns food into energy. There are two main types: Type 1 and Type 2.",
+      "symp": "Common symptoms include frequent urination, excessive thirst, extreme fatigue, blurred vision, and slow-healing wounds.",
+      "how to manage diabetes?": "You can manage diabetes by maintaining a healthy diet, exercising regularly, monitoring blood sugar levels, and taking prescribed medications.",
+      "what foods to avoid?": "Avoid sugary foods, refined carbs, and processed foods. Focus on whole grains, lean proteins, and vegetables.",
+      "normal blood sugar levels?": "Normal fasting blood sugar levels are between 70-100 mg/dL. After meals, it should be less than 140 mg/dL.",
+      "how does diabetes affect the immune system?": "diabetes can weaken the immune system, making it harder to fight off infections and increasing the risk of complications.",
+      "what is type 2 diabetes?": "type 2 diabetes is a chronic condition where the body becomes resistant to insulin or doesn't produce enough insulin, leading to high blood sugar levels.",
+      "how does smoking affect diabetes?": "smoking increases the risk of diabetes complications, such as heart disease, stroke, and poor circulation, and can worsen blood sugar control.",
+      "can diabetes cause eye problems?": "yes, diabetes can cause eye problems like diabetic retinopathy, cataracts, and glaucoma, which may lead to vision loss if untreated.",
+      "can diabetes affect pregnancy?": "yes, diabetes during pregnancy (gestational diabetes) can increase risks for both mother and baby, including high birth weight and preterm birth.",
+      "how is diabetes treated?": "diabetes is treated with lifestyle changes (diet, exercise), medications, and insulin therapy, depending on the type and severity.",
+      "what is diabetic ketoacidosis?": "diabetic ketoacidosis (dka) is a serious complication where high blood sugar and ketones cause the blood to become acidic, requiring emergency treatment.",
+      "how important is regular medical check-up for diabetes management?": "regular check-ups are crucial for monitoring blood sugar, screening for complications, and adjusting treatment plans.",
+      "can diabetes be prevented?": "type 2 diabetes can often be prevented or delayed with a healthy lifestyle, including diet, exercise, and weight management.",
+      "how do blood sugar levels affect health?": "uncontrolled blood sugar levels can lead to complications like nerve damage, kidney disease, heart disease, and vision problems.",
+      "what are the early signs of diabetes?": "early signs include increased thirst, frequent urination, unexplained weight loss, fatigue, and blurred vision.",
+      "what lifestyle changes can help manage diabetes?": "healthy eating, regular exercise, weight management, and quitting smoking can significantly help manage diabetes.",
+      "what are the risk factors for type 2 diabetes?": "risk factors include obesity, physical inactivity, family history, age, and prediabetes.",
+      "what are the long-term effects of diabetes?": "long-term effects include heart disease, kidney damage, nerve damage, vision loss, and foot problems.",
+      "what is hyperglycemia?": "hyperglycemia is high blood sugar, which can cause symptoms like thirst, frequent urination, and fatigue, and may lead to complications.",
+      "what is the impact of diabetes on daily life?": "diabetes requires daily management, including monitoring blood sugar, taking medications, and maintaining a healthy lifestyle.",
+      "what role does exercise play in managing diabetes?": "exercise helps control blood sugar, improve insulin sensitivity, and maintain a healthy weight.",
+      "can diabetes be cured?": "there is no cure for diabetes, but it can be managed effectively with treatment and lifestyle changes.",
+      "how often should people with diabetes check their blood sugar?": "frequency varies; some may need multiple daily checks, while others may check less often, as advised by their doctor.",
+      "what is insulin resistance?": "insulin resistance occurs when cells don't respond well to insulin, leading to higher blood sugar levels and often precedes type 2 diabetes.",
+      "what is the difference between type 1 and type 2 diabetes?": "type 1 is an autoimmune condition where the body attacks insulin-producing cells; type 2 involves insulin resistance or insufficient insulin production.",
+      "what is type 1 diabetes?": "type 1 diabetes is an autoimmune disease where the pancreas produces little or no insulin, requiring lifelong insulin therapy.",
+      "what is continuous glucose monitoring?": "continuous glucose monitoring (cgm) uses a sensor to track blood sugar levels in real-time, helping with diabetes management.",
+      "how does diet affect diabetes?": "a balanced diet helps control blood sugar, manage weight, and reduce the risk of complications.",
+     "what is a diabetic diet?": "a diabetic diet focuses on nutrient-dense foods, portion control, and monitoring carbohydrate intake to manage blood sugar.",
+    "is diabetes hereditary?": "genetics play a role, especially in type 2 diabetes, but lifestyle factors are also significant contributors.",
+  "what are the main types of diabetes?": "the main types are type 1, type 2, and gestational diabetes (occurring during pregnancy).",
+  "can diabetes lead to cardiovascular disease?": "yes, diabetes increases the risk of cardiovascular diseases like heart attack and stroke due to high blood sugar damaging blood vessels.",
+  "what is gestational diabetes?": "gestational diabetes occurs during pregnancy and usually resolves after birth but increases the risk of type 2 diabetes later.",
+  "what is diabetic neuropathy?": "diabetic neuropathy is nerve damage caused by high blood sugar, leading to pain, numbness, or weakness, often in the hands and feet.",
+  "what are diabetic foot problems?": "diabetes can cause foot problems like infections, ulcers, and poor circulation, sometimes leading to amputation if untreated.",
+  "can children get diabetes?": "yes, children can develop type 1 diabetes (more common) or type 2 diabetes, especially with obesity or family history.",
+  "what medications are used to treat diabetes?": "medications include insulin, metformin, sulfonylureas, and others, depending on the type and needs of the patient.",
+  "how does stress affect diabetes?": "stress can raise blood sugar levels and make diabetes harder to manage, so stress reduction techniques are important.",
+  "can alcohol consumption affect diabetes?": "alcohol can affect blood sugar levels and interact with diabetes medications, so moderation and monitoring are key.",
+  "what is an hba1c test?": "the hba1c test measures average blood sugar levels over the past 2-3 months, helping monitor long-term diabetes control.",
+  "what is a diabetes care plan?": "a diabetes care plan includes blood sugar monitoring, healthy eating, physical activity, medication, and regular medical check-ups.",
+  "can diabetes affect mental health?": "yes, diabetes can increase the risk of depression and anxiety due to the stress of managing the condition.",
+  "what are the common myths about diabetes?": "common myths include that eating sugar causes diabetes, or that people with diabetes can't eat any sugar.",
+  "how can technology help in managing diabetes?": "technology like cgms and insulin pumps can improve blood sugar monitoring and insulin delivery for better management.",
+  "how does diabetes affect the kidneys?": "diabetes can damage the kidneys (diabetic nephropathy), potentially leading to kidney failure if untreated.",
+  "how can weight loss impact diabetes?": "weight loss can improve blood sugar control, reduce insulin resistance, and lower the risk of complications in type 2 diabetes.",
+  "how is diabetes diagnosed?": "diabetes is diagnosed through blood tests like fasting glucose, oral glucose tolerance, or hba1c tests.",
+  "what causes diabetes?": "type 1 is caused by an autoimmune reaction; type 2 is linked to genetics and lifestyle factors like obesity and inactivity.",
+  "what are the symptoms of diabetes?": "symptoms include increased thirst, frequent urination, fatigue, blurred vision, slow-healing sores, and unexplained weight loss.",
+  "can pets get diabetes?": "yes, pets like dogs and cats can develop diabetes, requiring insulin therapy and dietary management similar to humans.",
+  "default": "I'm here to help with diabetes-related questions. Please ask me anything specific!", };
+
+    // Simulate bot typing
+    function showTypingIndicator() {
+      const typingIndicator = document.createElement('div');
+      typingIndicator.className = 'typing-indicator';
+      typingIndicator.textContent = "Typing...";
+      chatBox.appendChild(typingIndicator);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      return typingIndicator;
+    }
+
+    // Remove typing indicator
+    function hideTypingIndicator(typingIndicator) {
+      typingIndicator.remove();
+    }
+
+    // Send user message and get bot response
+    function sendMessage() {
+      const userMessage = userInput.value.trim().toLowerCase();
+      if (userMessage === "") {
+        alert("Please enter a message.");
+        return;
+      }
+
+      // Display user message
+      const userMessageElement = document.createElement('div');
+      userMessageElement.className = 'message user';
+      userMessageElement.textContent = userMessage;
+      chatBox.appendChild(userMessageElement);
+
+      // Clear input
+      userInput.value = "";
+
+      // Show typing indicator
+      const typingIndicator = showTypingIndicator();
+
+      // Simulate bot response delay
+      setTimeout(() => {
+        hideTypingIndicator(typingIndicator);
+
+        // Generate bot response
+        const botResponse = responses[userMessage] || responses["default"];
+        const botMessageElement = document.createElement('div');
+        botMessageElement.className = 'message bot';
+        botMessageElement.textContent = botResponse;
+        chatBox.appendChild(botMessageElement);
+
+        // Scroll to bottom
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }, 1500); // Simulate 1.5 seconds delay
+    }
+
+    // Allow pressing Enter to send message
+    userInput.addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+  </script>
+</body>
+</html>

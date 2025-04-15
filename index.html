@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diabetic Chatbot - Login</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --primary-dark: #2980b9;
+            --secondary-color: #2ecc71;
+            --secondary-dark: #27ae60;
+            --text-color: #333;
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --border-color: #dee2e6;
+            --error-color: #e74c3c;
+            --success-color: #2ecc71;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: var(--text-color);
+        }
+        
+        .app-title {
+            font-family: Arial, sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .login-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 420px;
+            padding: 2.5rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .login-container:hover {
+            transform: translateY(-5px);
+        }
+        
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 0.95rem;
+        }
+        
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            outline: none;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 1rem;
+            width: 100%;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        
+        button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .error {
+            color: var(--error-color);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+        
+        .success-message {
+            color: var(--success-color);
+            font-size: 0.9rem;
+            text-align: center;
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+        }
+        
+        .remember-me input {
+            margin-right: 0.5rem;
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary-color);
+        }
+        
+        .remember-me label {
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+        
+        .forgot-password {
+            text-align: right;
+        }
+        
+        .forgot-password a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+        
+        .status-message {
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+            display: none;
+            text-align: center;
+        }
+        
+        .error-message {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--error-color);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+        
+        .success-message {
+            background-color: rgba(46, 204, 113, 0.1);
+            color: var(--success-color);
+            border: 1px solid rgba(46, 204, 113, 0.3);
+        }
+        
+        .icon {
+            position: absolute;
+            right: 12px;
+            top: 42px;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-title">Diabetic Chatbot</div>
+    
+    <div class="login-container">
+        <h1>Welcome Back</h1>
+        
+        <div id="status-message" class="status-message"></div>
+        
+        <a id="loginForm">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                <div class="error" id="username-error">Please enter a valid username</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                <div class="error" id="password-error">Please enter your password</div>
+            </div>
+            
+            <div class="remember-forgot">
+                <div class="remember-me">
+                    <input type="checkbox" id="remember" name="remember">
+                    <label for="remember">Remember me</label>
+                </div>
+                
+                <div class="forgot-password">
+                    <a href="#">Forgot password?</a>
+                </div>
+            </div>
+            
+            <a href="/fr1.html"><button type="submit" id="login-button">Sign In</button> </a>
+        </form>
+    </div>
+
+    <script>
+        // Simulating a database with localStorage
+        // In a real application, this would be replaced with actual database calls
+
+        // Demo user data - in a real application this would come from a server
+        // IMPORTANT: Never store passwords in plaintext in a real application!
+        const demoUsers = [
+            { username: "user1", password: "password1" },
+            { username: "admin", password: "admin123" },
+            { username: "test", password: "test123" }
+        ];
+
+        // Initialize the simulated database if it doesn't exist
+        if (!localStorage.getItem('userDatabase')) {
+            localStorage.setItem('userDatabase', JSON.stringify(demoUsers));
+        }
+
+        // Function to display messages to the user
+        function showMessage(message, type) {
+            const statusMessage = document.getElementById('status-message');
+            statusMessage.textContent = message;
+            statusMessage.style.display = 'block';
+            
+            if (type === 'error') {
+                statusMessage.className = 'status-message error-message';
+            } else if (type === 'success') {
+                statusMessage.className = 'status-message success-message';
+            }
+            
+            setTimeout(() => {
+                statusMessage.style.display = 'none';
+            }, 3000);
+        }
+
+        // Function to validate login credentials against our simulated database
+        function validateLogin(username, password) {
+            const users = JSON.parse(localStorage.getItem('userDatabase'));
+            return users.some(user => user.username === username && user.password === password);
+        }
+
+        // Function to save login details if "Remember me" is checked
+        function saveLoginDetails(username, remember) {
+            if (remember) {
+                localStorage.setItem('rememberedUser', username);
+            } else {
+                localStorage.removeItem('rememberedUser');
+            }
+        }
+
+        // Check if there's a remembered user and auto-fill the username
+        document.addEventListener('DOMContentLoaded', function() {
+            const rememberedUser = localStorage.getItem('rememberedUser');
+            if (rememberedUser) {
+                document.getElementById('username').value = rememberedUser;
+                document.getElementById('remember').checked = true;
+            }
+        });
+
+        // Handle form submission
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            // Reset errors
+            document.getElementById('username-error').style.display = 'none';
+            document.getElementById('password-error').style.display = 'none';
+            
+            // Get values
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const remember = document.getElementById('remember').checked;
+            
+            // Simple validation
+            let isValid = true;
+            
+            if (!username) {
+                document.getElementById('username-error').style.display = 'block';
+                isValid = false;
+            }
+            
+            if (!password) {
+                document.getElementById('password-error').style.display = 'block';
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                return;
+            }
+            
+            // Add visual feedback on button click
+            const button = document.getElementById('login-button');
+            button.innerHTML = 'Signing in...';
+            button.disabled = true;
+            
+            // Simulate server request delay
+            setTimeout(function() {
+                // Check credentials against our simulated database
+                if (validateLogin(username, password)) {
+                    // Save login details if "Remember me" is checked
+                    saveLoginDetails(username, remember);
+                    
+                    showMessage('Login successful! Redirecting...', 'success');
+                    
+                    // Store authentication state
+                    sessionStorage.setItem('isLoggedIn', 'true');
+                    sessionStorage.setItem('currentUser', username);
+                    
+                    // Redirect to fr1.html after successful login
+                    setTimeout(function() {
+                        window.location.href = 'fr1.html';
+                    }, 1000);
+                } else {
+                    showMessage('Invalid username or password', 'error');
+                    button.innerHTML = 'Sign In';
+                    button.disabled = false;
+                }
+            }, 800);
+        });
+
+        
+        // REAL DATABASE CONNECTION IMPLEMENTATION
+        // This is how you would connect to a real database using AJAX/Fetch API
+        
+        // Login function with real database connection
+        async function loginUser(username, password) {
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    return { success: true, user: data.user };
+                } else {
+                    return { success: false, message: data.message };
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                return { success: false, message: 'Network error. Please try again.' };
+            }
+        }
+        
+        // Then in the form submission handler, replace the validateLogin with:
+        
+        const result = await loginUser(username, password);
+        if (result.success) {
+            // Save login details if "Remember me" is checked
+            if (remember) {
+                localStorage.setItem('rememberedUser', username);
+            }
+            
+            // Store auth token received from server
+            localStorage.setItem('authToken', result.user.token);
+            
+            showMessage('Login successful! Redirecting...', 'success');
+            setTimeout(function() {
+                window.location.href = 'fr1.html';
+            }, 1000);
+        } else {
+            showMessage(result.message || 'Invalid username or password', 'error');
+        }
+        
+    </script>
+</body>
+</html>
